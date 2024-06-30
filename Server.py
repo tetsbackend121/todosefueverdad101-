@@ -5,6 +5,13 @@ import uuid
 
 app = Flask(__name__)
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'https://frontendconvert.onrender.com')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+    return response
+
 blobs = {}
 
 @app.route('/uploadLink', methods=['POST'])
