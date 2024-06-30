@@ -9,7 +9,7 @@ blobs = {}
 
 @app.route('/', methods=['GET'])
 def index():
-    return app.send_static_file('index.html')
+    return "hello world python"
 
 @app.route('/uploadLink', methods=['POST'])
 def convertir():
