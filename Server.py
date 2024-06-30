@@ -3,13 +3,9 @@ import modulos.download_link as download_link
 import io
 import uuid
 
-app = Flask(__name__, static_url_path='/public', static_folder='public')
+app = Flask(__name__)
 
 blobs = {}
-
-@app.route('/', methods=['GET'])
-def index():
-    return "hello world python"
 
 @app.route('/uploadLink', methods=['POST'])
 def convertir():
