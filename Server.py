@@ -14,6 +14,11 @@ def after_request(response):
 
 blobs = {}
 
+# Ruta para responder con "Hola, mundo"
+@app.route('/')
+def hello_world():
+    return 'Hola, mundo!'
+
 @app.route('/uploadLink', methods=['POST'])
 def convertir():
     global nombrefile
