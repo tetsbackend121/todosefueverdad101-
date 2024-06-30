@@ -38,21 +38,12 @@ def convertir():
         except FileNotFoundError:
             return jsonify({"message": "Archivo no encontrado"}), 404
 
-        # Crear un objeto BytesIO para simular un Blob
-        blob = io.BytesIO()
-        blob.write(data)
-        blob.seek(0)
-
-        # Generar un ID único para este Blob
+        blob = io.BytesIO(data)
         blob_id = str(uuid.uuid4())
-        
-        # Guardar el Blob en el diccionario usando el ID como clave
         blobs[blob_id] = blob
 
-        # Generar el enlace al blob
         blob_url = f'/blobs/{blob_id}'
 
-        # Devolver una respuesta JSON con el enlace al blob
         return jsonify({"blob_url": blob_url})
 
     elif format == "MP3":
@@ -79,26 +70,52 @@ def convertir():
 
         return jsonify({"blob_url": blob_url})
 
-
     else:
         return jsonify({"message": "Formato no soportado"}), 400
 
 @app.route('/blobs/<blob_id>', methods=['GET'])
 def download_blob(blob_id):
-    # Obtener el Blob del diccionario usando el ID
     blob = blobs.get(blob_id)
     if blob:
         try:
-            # Crear una respuesta Flask para enviar el Blob como archivo adjunto
-            response = make_response(send_file(blob, as_attachment=True, download_name=f'{nombrefile}'))
+            response = make_response(send_file(blob, as_attachment=True, attachment_filename=f'{nombrefile}'))
             response.headers['Content-Disposition'] = f'attachment; filename={nombrefile}'
             return response
-        
         except ValueError:
-            # Si el archivo está cerrado, devolver un error
             return 'Archivo no disponible o ya descargado', 410
     else:
         return 'Archivo no encontrado', 404
 
 if __name__ == '__main__':
-    app.run(debug=True, port=80)
+    import os
+    from werkzeug.middleware.shared_data import SharedDataMiddleware
+
+    # Añadir middleware para servir archivos estáticos
+    app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
+        '/public': os.path.join(os.path.dirname(__file__), 'public')
+    })
+
+    # Ejecutar la aplicación con Gunicorn en lugar del servidor de desarrollo
+    from gunicorn.app.base import BaseApplication
+
+    class StandaloneApplication(BaseApplication):
+        def __init__(self, app, options=None):
+            self.options = options or {}
+            self.application = app
+            super().__init__()
+
+        def load_config(self):
+            for key, value in self.options.items():
+                self.cfg.set(key, value)
+
+        def load(self):
+            return self.application
+
+    options = {
+        'bind': '0.0.0.0:80',
+        'workers': 4,  # Número de workers que quieres configurar
+        'accesslog': '-',  # Log de acceso a la consola
+        'errorlog': '-',  # Log de errores a la consola
+    }
+
+    StandaloneApplication(app, options).run()
