@@ -25,6 +25,13 @@ link_schema = {
 # Crear un validador
 v = Validator(link_schema)
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'https://frontendconvert.onrender.com')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+    return response
+
 @app.route('/', methods=['GET'])
 def index():
     return "Hola mundo python"
@@ -127,4 +134,38 @@ def download_blob(blob_id):
         return 'Archivo no encontrado en MongoDB', 404
 
 if __name__ == '__main__':
-    app.run(debug=True, port=80)
+    import os
+    from werkzeug.middleware.shared_data import SharedDataMiddleware
+
+    # Añadir middleware para servir archivos estáticos
+    app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
+        '/public': os.path.join(os.path.dirname(__file__), 'public')
+    })
+
+    if os.getenv('FLASK_ENV') == 'development':
+        app.run(debug=True, port=80)
+    else:
+        # Ejecutar la aplicación con Gunicorn en producción
+        from gunicorn.app.base import BaseApplication
+
+        class StandaloneApplication(BaseApplication):
+            def __init__(self, app, options=None):
+                self.options = options or {}
+                self.application = app
+                super().__init__()
+
+            def load_config(self):
+                for key, value in self.options.items():
+                    self.cfg.set(key, value)
+
+            def load(self):
+                return self.application
+
+        options = {
+            'bind': '0.0.0.0:80',
+            'workers': 4,  # Número de workers que quieres configurar
+            'accesslog': '-',  # Log de acceso a la consola
+            'errorlog': '-',  # Log de errores a la consola
+        }
+
+        StandaloneApplication(app, options).run()
