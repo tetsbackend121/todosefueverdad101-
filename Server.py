@@ -53,9 +53,14 @@ def convertir():
         if not url or not resolution:
             return jsonify({"message": "Link o resolución no especificados"}), 400
 
+        resolution_path = f"downloads/mp4/{resolution}p"
+        
+        # Crear el directorio si no existe
+        os.makedirs(resolution_path, exist_ok=True)
+
         nombrefile = download_link.ConvertMP4(url, resolution + "p")
 
-        file_path = f"downloads/mp4/{resolution}p/{nombrefile}"
+        file_path = os.path.join(resolution_path, nombrefile)
 
         if not os.path.exists(file_path):
             return jsonify({"message": "Archivo no encontrado"}), 404
@@ -90,6 +95,9 @@ def convertir():
         nombrefile = download_link.ConvertMP3(url)
 
         file_path = f"downloads/mp3/{nombrefile}"
+
+        # Crear el directorio si no existe
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
         if not os.path.exists(file_path):
             return jsonify({"message": "Archivo no encontrado"}), 404
