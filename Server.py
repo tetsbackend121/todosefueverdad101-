@@ -1,8 +1,7 @@
-from flask import Flask, request, jsonify, make_response, send_file
+from flask import Flask, request, jsonify, send_file
 from pymongo import MongoClient
 from cerberus import Validator
 import modulos.download_link as download_link
-import io
 import os
 import uuid
 
@@ -144,8 +143,6 @@ def download_blob(blob_id):
 if __name__ == '__main__':
     import os
     from werkzeug.middleware.shared_data import SharedDataMiddleware
-
-    
 
     if os.getenv('FLASK_ENV') == 'development':
         app.run(debug=True, port=80)
