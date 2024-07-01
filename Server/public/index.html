@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertidor de Video a MP3</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Convertidor de Video a MP3</h1>
+    <form id="conversionForm">
+        <label for="linkInput">Enlace del Video:</label>
+        <input type="text" id="linkInput" name="linkInput" required><br><br>
+
+        <div id="resolutionContainer">
+            <label for="resolutionSelect" id="resolutionLabel">Resolución:</label>
+            <select id="resolutionSelect" name="resolutionSelect">
+                <option value="1080">1080p</option>
+                <option value="360">360p</option>
+            </select><br><br>
+        </div>
+
+        <label for="formatSelect">Formato de Salida:</label>
+        <select id="formatSelect" name="formatSelect" onchange="toggleResolution()">
+            <option value="MP4">MP4</option>
+            <option value="MP3">MP3</option>
+        </select><br><br>
+
+        <button type="submit">Convertir</button>
+    </form>
+
+    <div id="resultado"></div>
+    <div id="descargar"></div>
+
+    <script>
+        document.getElementById('conversionForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            enviarDatos();
+        });
+
+        function toggleResolution() {
+            const format = document.getElementById('formatSelect').value;
+            const resolutionContainer = document.getElementById('resolutionContainer');
+
+            if (format === 'MP3') {
+                resolutionContainer.classList.add('hidden');
+            } else {
+                resolutionContainer.classList.remove('hidden');
+            }
+        }
+
+        async function enviarDatos() {
+            const link = document.getElementById('linkInput').value;
+            const resolution = document.getElementById('resolutionSelect').value;
+            const format = document.getElementById('formatSelect').value;
+
+            const datos = {
+                link: link,
+                resolution: format === 'MP3' ? null : resolution,
+                format: format
+            };
+
+            try {
+                const response = await fetch('/uploadLink', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al enviar los datos al servidor.');
+                }
+
+                const resultado = await response.json();
+
+                document.getElementById('resultado').innerHTML = `<a href="${resultado.blob_url}">Descargar el archivo</a>`;
+
+                // Función que deseas ejecutar después de 3 segundos
+                /*function myFunction() {
+                    document.getElementById('resultado').innerHTML = `<p>Online Server</p>`;
+                }
+
+                // Ejecutar myFunction después de 3 segundos
+                setTimeout(myFunction, 3000);*/
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('resultado').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        // Inicializa el estado de resolución basado en la selección actual de formato
+        document.addEventListener('DOMContentLoaded', toggleResolution);
+    </script>
+</body>
+</html>
