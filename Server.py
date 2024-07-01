@@ -6,7 +6,7 @@ import io
 import os
 import uuid
 
-app = Flask(__name__, static_url_path='/public', static_folder='public')
+app = Flask(__name__)
 
 # Conectar a MongoDB
 client = MongoClient('mongodb+srv://reypele18:mierda@dealgo.psquqeb.mongodb.net/downloads?retryWrites=true&w=majority&appName=dealgo')
@@ -27,7 +27,7 @@ v = Validator(link_schema)
 
 @app.route('/', methods=['GET'])
 def index():
-    return app.send_static_file('index.html')
+    return "Hola mundo python"
 
 @app.route('/uploadLink', methods=['POST'])
 def convertir():
