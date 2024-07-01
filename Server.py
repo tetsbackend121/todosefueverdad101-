@@ -145,10 +145,7 @@ if __name__ == '__main__':
     import os
     from werkzeug.middleware.shared_data import SharedDataMiddleware
 
-    # Añadir middleware para servir archivos estáticos
-    app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
-        '/public': os.path.join(os.path.dirname(__file__), 'public')
-    })
+    
 
     if os.getenv('FLASK_ENV') == 'development':
         app.run(debug=True, port=80)
