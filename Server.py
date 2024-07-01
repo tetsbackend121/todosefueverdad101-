@@ -31,10 +31,6 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
     return response
 
-@app.route('/', methods=['GET'])
-def index():
-    return "Hola mundo python"
-
 @app.route('/uploadLink', methods=['POST'])
 def convertir():
     global nombrefile
@@ -52,8 +48,8 @@ def convertir():
         if not url or not resolution:
             return jsonify({"message": "Link o resolución no especificados"}), 400
 
-        resolution_path = f"downloads/mp4/{resolution}p"
-        
+        resolution_path = os.path.join("downloads", "mp4", resolution + "p")
+
         # Crear el directorio si no existe
         os.makedirs(resolution_path, exist_ok=True)
 
@@ -123,51 +119,5 @@ def convertir():
     else:
         return jsonify({"message": "Formato no soportado"}), 400
 
-@app.route('/blobs/<blob_id>', methods=['GET'])
-def download_blob(blob_id):
-    # Buscar el documento en MongoDB por blob_id
-    resultado = collection.find_one({"blob_id": blob_id})
-
-    if resultado:
-        file_path = resultado['file_path']
-        
-        if not os.path.exists(file_path):
-            return 'Archivo no encontrado', 404
-
-        # Crear una respuesta Flask para enviar el archivo como adjunto
-        return send_file(file_path, as_attachment=True, download_name=resultado['name'])
-
-    else:
-        return 'Archivo no encontrado en MongoDB', 404
-
 if __name__ == '__main__':
-    import os
-    from werkzeug.middleware.shared_data import SharedDataMiddleware
-
-    if os.getenv('FLASK_ENV') == 'development':
-        app.run(debug=True, port=80)
-    else:
-        # Ejecutar la aplicación con Gunicorn en producción
-        from gunicorn.app.base import BaseApplication
-
-        class StandaloneApplication(BaseApplication):
-            def __init__(self, app, options=None):
-                self.options = options or {}
-                self.application = app
-                super().__init__()
-
-            def load_config(self):
-                for key, value in self.options.items():
-                    self.cfg.set(key, value)
-
-            def load(self):
-                return self.application
-
-        options = {
-            'bind': '0.0.0.0:80',
-            'workers': 4,  # Número de workers que quieres configurar
-            'accesslog': '-',  # Log de acceso a la consola
-            'errorlog': '-',  # Log de errores a la consola
-        }
-
-        StandaloneApplication(app, options).run()
+    app.run(debug=True, port=80)
