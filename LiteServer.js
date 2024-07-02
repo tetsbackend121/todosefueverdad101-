@@ -79,7 +79,11 @@ app.post('/uploadLink', async (req, res) => {
         };
 
         // Realizar la solicitud POST usando fetch
-        fetch(ipNGROK+"/uploadLink", requestOptions)
+        console.log("ACA")
+        PETICION = ipNGROK+"/uploadLink"
+        console.log(PETICION)
+        fetch(PETICION, requestOptions)
+            console.log("FETCH ")
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Hubo un problema al realizar la solicitud: ' + response.statusText);
@@ -87,15 +91,15 @@ app.post('/uploadLink', async (req, res) => {
                 return response.json();  // Convertir la respuesta a JSON
             })
             .then(data => {
-                console.log('Respuesta del servidor:', data);
-                code = data.blob_url
-                console.log(code)
+                console.log('Respuesta del servidor:');
+                //code = data.blob_url
+                console.log("code")
                 
-                return res.status(200).json()
+                return res.status(200).json({m: "TODOBIEN QUE RARO"})
                 // Manejar la respuesta del servidor aquí
             })
             .catch(error => {
-                console.error('Error al realizar la solicitud:', error);
+                console.log('ERROR CACA:', error);
     });
 
 
