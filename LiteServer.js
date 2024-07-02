@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require("cors")
 
 const app = express();
-const port = 8080;
+const port = 80;
 
 const db = 'mongodb+srv://reypele18:mierda@dealgo.psquqeb.mongodb.net/IPCONFIG?retryWrites=true&w=majority&appName=dealgo';
 const corsOptions = {
