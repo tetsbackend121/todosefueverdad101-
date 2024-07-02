@@ -105,14 +105,14 @@ app.post('/uploadLink', async (req, res) => {
 
 
         // Intentar eliminar el documento
-        const deleteResult = "ddd"//await IPCONFIGModel.deleteOne({ name: nameServer});
+        //const deleteResult = "ddd"//await IPCONFIGModel.deleteOne({ name: nameServer});
 
-        if (deleteResult.deletedCount === 0) {
-            return res.status(404).json({ mensaje: 'No se encontró ningún documento con el ID especificado' });
-        }
+        //if (deleteResult.deletedCount === 0) {
+            //return res.status(404).json({ mensaje: 'No se encontró ningún documento con el ID especificado' });
+        //}
 
         // Documento eliminado correctamente
-        res.status(200).json({ mensaje: 'Documento eliminado correctamente' });
+        //res.status(200).json({ mensaje: 'Documento eliminado correctamente' });
 
     } catch (error) {
         console.log('Error al eliminar el documento:', error);
