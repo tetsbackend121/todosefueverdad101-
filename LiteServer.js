@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const bodyParser = require('body-parser');
-const cors = require("cors")
+const cors = require('cors');
 
 const app = express();
 const port = 80;
@@ -16,13 +16,15 @@ const corsOptions = {
 };
 
 // Habilitar CORS con las opciones definidas
-//app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
-mongoose.connect(db, {}).then(() => {
-    console.log("Conexión exitosa a la base de datos");
-}).catch((error) => {
-    console.error("Error al conectar a la base de datos:", error);
-});
+mongoose.connect(db, {})
+    .then(() => {
+        console.log("Conexión exitosa a la base de datos");
+    })
+    .catch((error) => {
+        console.error("Error al conectar a la base de datos:", error);
+    });
 
 const IPCONFIGSchema = mongoose.Schema({
     ip: { type: String, required: true },
@@ -31,31 +33,35 @@ const IPCONFIGSchema = mongoose.Schema({
 
 const LINKSchema = mongoose.Schema({
     link: { type: String, required: true },
-    resolution: { type: String},
+    resolution: { type: String },
     format: { type: String, required: true }
 });
 
 const IPCONFIGModel = mongoose.model("IPCONFIG", IPCONFIGSchema, "IPCONFIG");
-
 const LINKSModel = mongoose.model("LINKS", LINKSchema, "LINKS");
 
 app.use(express.json());
-app.use(bodyParser.json({ limit: '100mb' })); // Aumenta el límite de carga útil a 10 megabytes
+app.use(bodyParser.json({ limit: '100mb' })); // Aumenta el límite de carga útil a 100 megabytes
 
 app.post('/uploadLink', async (req, res) => {
+    console.log("Alguien hizo un POST.");
 
-    console.log("Alguien post hizo.")
-    
-    // Obtener el ID desde los parámetros de la URL
-    const nameServer = "NGROK"
-    const URL_NGROK = await IPCONFIGModel.findOne({ name: "NGROK"});
-    const ipNGROK = URL_NGROK.ip
-
-    res.send(ipNGROK)
-
-
+    try {
+        // Obtener el ID desde los parámetros de la URL
+        const nameServer = "NGROK";
+        const URL_NGROK = await IPCONFIGModel.findOne({ name: nameServer });
+        
+        if (!URL_NGROK) {
+            return res.status(404).json({ error: "No se encontró la configuración NGROK" });
+        }
+        
+        const ipNGROK = URL_NGROK.ip;
+        res.json({ ip: ipNGROK });
+    } catch (error) {
+        console.error("Error al obtener la configuración NGROK:", error);
+        res.status(500).json({ error: "Error al obtener la configuración NGROK" });
+    }
 });
-
 
 app.listen(port, () => {
     console.log(`Servidor Express escuchando en el puerto ${port}`);
