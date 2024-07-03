@@ -56,9 +56,10 @@ app.post('/uploadLink', async (req, res) => {
         }
         
         const ipNGROK = URL_NGROK.ip;
-        res.json({ ip: ipNGROK });
+        res.status(201).json({ ip: ipNGROK });
+        console.log("Enviado")
     } catch (error) {
-        console.error("Error al obtener la configuración NGROK:", error);
+        console.log("Error al obtener la configuración NGROK:", error);
         res.status(500).json({ error: "Error al obtener la configuración NGROK" });
     }
 });
