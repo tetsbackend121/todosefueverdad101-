@@ -9,7 +9,7 @@ const port = 80;
 
 const db = 'mongodb+srv://reypele18:mierda@dealgo.psquqeb.mongodb.net/IPCONFIG?retryWrites=true&w=majority&appName=dealgo';
 const corsOptions = {
-    origin: 'https://frontendconvert.onrender.com', // Permitir solo este origen
+    origin: 'https://easytubeconvert.onrender.com', // Permitir solo este origen
     methods: ['GET', 'POST'], // Permitir solo estos métodos HTTP
     allowedHeaders: ['Content-Type'], // Permitir solo estos encabezados
     optionsSuccessStatus: 200 // Algunos navegadores no envían 'OPTIONS' automáticamente, por lo que la respuesta de éxito se debe configurar explícitamente
