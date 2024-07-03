@@ -42,7 +42,7 @@ const LINKSModel = mongoose.model("LINKS", LINKSchema, "LINKS");
 app.use(express.json());
 app.use(bodyParser.json({ limit: '100mb' })); // Aumenta el límite de carga útil a 10 megabytes
 
-app.post('/', async (req, res) => {
+app.post('/uploadLink', async (req, res) => {
 
     console.log("Alguien post hizo.")
     
